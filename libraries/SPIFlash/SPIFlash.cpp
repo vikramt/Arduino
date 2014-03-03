@@ -66,7 +66,7 @@ word SPIFlash::readDeviceId()
   command(SPIFLASH_IDREAD); // Read JEDEC ID
 #else
   select();
-  SPI.transfer(SPIFLASH_IDREAD);
+  SPI.transfer(SPIFLASH_IDREAD); SPI.transfer(0);SPI.transfer(0);SPI.transfer(0);
 #endif
   word jedecid = SPI.transfer(0) << 8;
   jedecid |= SPI.transfer(0);
