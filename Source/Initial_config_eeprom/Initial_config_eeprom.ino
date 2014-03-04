@@ -34,7 +34,7 @@ void setup()
   cfgcmds.setnodeID(22);
   Serial.println("Reading from local again:");
   EEPROM.readBlock(0, CONFIG);
-  Serial.print(CONFIG.frequency);
+  Serial.print(CONFIG.nodeID);
   Serial.println("Reread from class");
   cfgcmds.readconfig();
   Serial.println("Reading nodeID  again from class:");
