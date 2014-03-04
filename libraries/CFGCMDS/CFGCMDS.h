@@ -51,8 +51,9 @@
 
 class CFGCMDS {
 	private:
+	Configuration _config;
+	
 	public:
-	Configuration config;
 	CFGCMDS(void);
 	void setinvalid ( void );
 	void setdefaultconfig(byte nodeid);

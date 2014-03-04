@@ -4,7 +4,7 @@
 #include <RFM69.h> //get it here: http://github.com/lowpowerlab/rfm69
 #include <SPIFlash.h> //get it here: http://github.com/lowpowerlab/spiflash
 #include <avr/wdt.h> //comes with Arduino
-#include <COMMANDS.h>
+#include <CFGCMDS.h>
 
 //these settings are for the SwitchMotes, should match the same values exactly from the SwitchMote sketch
 #define SYNC_MAX_COUNT 10 //max number of other nodes to SYNC with, keep the same with same setting in SwitchMote sketch!
@@ -16,12 +16,17 @@ int SYNC_INFO[SYNC_MAX_COUNT]; // stores the buttons and modes of this and the r
 
 
 Configuration   CONFIG; //see commands.h for details
+CFGCMDS config; //instantiate the class
+
 
 void setup()
 {
   Serial.begin(115200);
   EEPROM.readBlock(0, CONFIG);
-  //readConfig(0,CONFIG);
+  Serial.println("Reading from class:");
+  byte f = config.getfrequency();
+    
+  
   if (CONFIG.frequency!=RF69_433MHZ && CONFIG.frequency!=RF69_868MHZ && CONFIG.frequency!=RF69_915MHZ) // virgin CONFIG, expected [4,8,9]
   {
     Serial.println("No valid config found in EEPROM, writing defaults");
