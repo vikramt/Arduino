@@ -1,6 +1,5 @@
 #ifndef _COMMANDS_H_
 #define _COMMANDS_H_
-
 #if ARDUINO >= 100
 #include <Arduino.h>
 #else
@@ -50,6 +49,39 @@
   
 } Configuration;
 
+class COMMANDS {
+	private:
+	public:
+	COMMANDS(void);
+	Configuration config;
+	void setinvalid ( void );
+	void setdefaultconfig(byte nodeid);
+	void setfrequency(byte frequency);
+	void setisHW(byte isHW);
+	void setnodeID(byte nodeid);
+	void setnetworkID(byte networkID);
+	void setdescription (char* description);
+	void setxmitmin (byte xmitmin);
+	void setxmitchange(byte xmitchange);
+	void setsleepseconds(byte sleepseconds);
+	void setradiopower ( byte radiopower);
+	void setlisten100ms( byte listen100ms);
+	void settempcalibration ( byte tempcalibration );
+	
+    bool getisvalid ( void );
+	void getfrequency(byte frequency);
+	void getisHW(byte isHW);
+	void getnodeID(byte nodeid);
+	void getnetworkID(byte networkID);
+	void getdescription (char* description);
+	void getxmitmin (byte xmitmin);
+	void getxmitchange(byte xmitchange);
+	void getsleepseconds(byte sleepseconds);
+	void getradiopower ( byte radiopower);
+	void getlisten100ms( byte listen100ms);
+	void gettempcalibration ( byte tempcalibration );
+	
+};
 
 
 #endif
