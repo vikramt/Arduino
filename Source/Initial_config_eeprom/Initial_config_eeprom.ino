@@ -23,17 +23,25 @@ void setup()
 {
   Serial.begin(115200);
   EEPROM.readBlock(0, CONFIG);
-  Serial.println("Reading frequency from class:");
+  Serial.println("Reading nodeID from class:");
   Serial.print(cfgcmds.getnodeID());
   Serial.println("Reading from local:");
   Serial.print(CONFIG.nodeID);
   
-
+  delay(5000);
   
   Serial.println("Setting nodeid 22 into class");
+  cfgcmds.setnodeID(22);
   Serial.println("Reading from local again:");
   EEPROM.readBlock(0, CONFIG);
   Serial.print(CONFIG.frequency);
+  Serial.println("Reread from class");
+  cfgcmds.readconfig();
+  Serial.println("Reading nodeID  again from class:");
+  Serial.print(cfgcmds.getnodeID());
+  delay(5000);
+  
+  
   
   
   
