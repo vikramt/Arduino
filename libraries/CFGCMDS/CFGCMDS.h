@@ -52,9 +52,12 @@
 class CFGCMDS {
 	private:
 	Configuration _config;
+	bool writeconfig(void);
+	
 	
 	public:
 	CFGCMDS(void);
+	bool readconfig(void);
 	void setinvalid ( void );
 	void setdefaultconfig(byte nodeid);
 	void setfrequency(byte frequency);

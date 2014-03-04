@@ -16,15 +16,29 @@ int SYNC_INFO[SYNC_MAX_COUNT]; // stores the buttons and modes of this and the r
 
 
 Configuration   CONFIG; //see commands.h for details
-CFGCMDS config; //instantiate the class
+CFGCMDS cfgcmds; //instantiate the class
 
 
 void setup()
 {
   Serial.begin(115200);
   EEPROM.readBlock(0, CONFIG);
-  Serial.println("Reading from class:");
-  byte f = config.getfrequency();
+  Serial.println("Reading frequency from class:");
+  Serial.print(cfgcmds.getnodeID());
+  Serial.println("Reading from local:");
+  Serial.print(CONFIG.nodeID);
+  
+
+  
+  Serial.println("Setting nodeid 22 into class");
+  Serial.println("Reading from local again:");
+  EEPROM.readBlock(0, CONFIG);
+  Serial.print(CONFIG.frequency);
+  
+  
+  
+
+
     
   
   if (CONFIG.frequency!=RF69_433MHZ && CONFIG.frequency!=RF69_868MHZ && CONFIG.frequency!=RF69_915MHZ) // virgin CONFIG, expected [4,8,9]
