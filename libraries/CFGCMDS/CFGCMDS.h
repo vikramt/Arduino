@@ -7,6 +7,18 @@
 #include "pins_arduino.h"
 #endif
 
+// bit position for bitchanged configuration
+#define bit_temperature 0
+#define bit_voltage 1
+#define bit_data0 2
+#define bit_data1 3
+#define bit_data2 4
+#define bit_data3 5
+#define bit_data4 6
+#define bit_data5 7
+
+
+//Commands magic numbers are below
 #define ConfigRead 100
 #define ConfigWrite 101
 #define DataRead	110
