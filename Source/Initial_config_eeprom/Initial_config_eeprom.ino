@@ -1,8 +1,10 @@
+
 #include <EEPROMex.h> //get it here: http://playground.arduino.cc/Code/EEPROMex
 #include <SPI.h>
 #include <RFM69.h> //get it here: http://github.com/lowpowerlab/rfm69
 #include <SPIFlash.h> //get it here: http://github.com/lowpowerlab/spiflash
 #include <avr/wdt.h> //comes with Arduino
+#include <COMMANDS.h>
 
 //these settings are for the SwitchMotes, should match the same values exactly from the SwitchMote sketch
 #define SYNC_MAX_COUNT 10 //max number of other nodes to SYNC with, keep the same with same setting in SwitchMote sketch!
@@ -10,56 +12,32 @@
 byte SYNC_TO[SYNC_MAX_COUNT]; // stores the address of the remote SM(s) that this SM has to notify/send request to
 int SYNC_INFO[SYNC_MAX_COUNT]; // stores the buttons and modes of this and the remote SM as last 4 digits:
 
-typedef struct  {
-  byte frequency;
-  byte isHW;
-  byte nodeID;
-  byte networkID;
-  char encryptionKey[16];
-  byte separator1; //separators needed to keep strings from overlapping
-  char description[10];
-  byte separator2;
-  char reserved[64];
-  byte seperator3;
-  byte xmitmin; //xmit minimally atleast this many minutes default 5 mins
-  byte sleepseconds; //go back to sleep for this many seconds - node wakes up default every seconds. default 10 seconds
-  byte sleepminutes; // extended sleep if needed default 0
-  byte datamin;   //send minimum for sensor data
-  byte datamax;   //send max for sensor data
-  byte dataavg;   // send avg for sensor data
-  byte dataactual; // send actual data how many samples  per xmit - depends on sleep seconds
-  byte radiopower;  //set default radio power to 3
-  byte listen100ms; // listen for how many 100 ms  after xmit
-  byte tempcalibration;  //use this for radio temp sensor calib default -1
-  
-} configuration;
 
-configuration CONFIG;
+
+
+Configuration   CONFIG; //see commands.h for details
 
 void setup()
 {
   Serial.begin(115200);
   EEPROM.readBlock(0, CONFIG);
+  //readConfig(0,CONFIG);
   if (CONFIG.frequency!=RF69_433MHZ && CONFIG.frequency!=RF69_868MHZ && CONFIG.frequency!=RF69_915MHZ) // virgin CONFIG, expected [4,8,9]
   {
     Serial.println("No valid config found in EEPROM, writing defaults");
     CONFIG.separator1=CONFIG.separator2=CONFIG.seperator3=0;
     CONFIG.frequency=RF69_433MHZ;
-    CONFIG.description[0]=0;
-    CONFIG.reserved[0]=0;
-    CONFIG.encryptionKey[0]=0;
     CONFIG.isHW=1;
     CONFIG.nodeID=36;
     CONFIG.networkID=10;
+    strcpy (CONFIG.encryptionKey,"sampleEncryptKey");
+    strcpy(CONFIG.description, "general node");
+  CONFIG.reserved[0]=0;
   CONFIG.xmitmin = 5; //xmit minimally atleast this many minutes default 5 mins
-  CONFIG.sleepseconds=10; //go back to sleep for this many seconds - node wakes up default every seconds. default 10 seconds
-  CONFIG.sleepminutes=0; // extended sleep if needed default 0
-  CONFIG.datamin=0;   //send minimum for sensor data
-  CONFIG.datamax=0;   //send max for sensor data
-  CONFIG.dataavg=0;   // send avg for sensor data
-  CONFIG.dataactual=5; // send actual data how many samples  per xmit - depends on sleep seconds
+  CONFIG.xmitchange = 1; //if 1 xmit when changes 0 wait for sleep timer for xmit use each bit for each piece of data
+  CONFIG.sleepseconds=10; //go back to sleep for this many seconds - node wakes up default every seconds. default 10 seconds  
   CONFIG.radiopower=3;  //set default radio power to 3
-  CONFIG.listen100ms=0; // listen for how many 100 ms  after xmit
+  CONFIG.listen100ms=5; // listen for how many 100 ms  after xmit
   CONFIG.tempcalibration=-1;  //use this for radio temp sensor calib default -1
     
   }
