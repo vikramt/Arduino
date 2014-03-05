@@ -54,7 +54,7 @@ long prevdistance = 0;
 
 
 void setup() {
-  Serial1.begin(SERIAL_BAUD);
+  Serial.begin(SERIAL_BAUD);
   pinMode(TRIG, OUTPUT);
   pinMode(ECHO, INPUT);
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
@@ -66,7 +66,7 @@ void setup() {
   radio.encrypt(ENCRYPTKEY);
   char buff[50];
   sprintf(buff, "\nTransmitting at %d Mhz...", FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
-  Serial1.println(buff);
+  Serial.println(buff);
   
   
 }
@@ -91,16 +91,16 @@ void loop()
              
         if (distance >= 400 || distance <= 0)
          {
-          Serial1.println("Out of range:");
-          Serial1.print(distance);
+          Serial.println("Out of range:");
+          Serial.print(distance);
           distance=999;
          }
         else 
          {
-           Serial1.print(distance);
-           Serial1.print(" cm");
-           Serial1.print(" Temp ");
-           Serial1.print(temperature);
+           Serial.print(distance);
+           Serial.print(" cm");
+           Serial.print(" Temp ");
+           Serial.print(temperature);
             
          }
         sprintf(payload, "SUMP:%ld TEMP:%ld", distance,temperature);
@@ -121,11 +121,11 @@ void loop()
          if (prevdistance    != distance   )      { datachanged|(1<<bit_data0) ;       prevdistance    = distance;    } 
          
          if (radio.sendWithRetry(GATEWAYID, payload, sendSize))
-            Serial1.println(" ok ");
-         else Serial1.println(" noackrcvd");
+            Serial.println(" ok ");
+         else Serial.println(" noackrcvd");
           
     
-             //         We just dis transmit 
+             //         We just did transmit 
             //    Add listen for 200ms code here
            //     this will mess up the sleep in seconds for 1 go around ....
           //
