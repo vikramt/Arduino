@@ -21,22 +21,54 @@ bool  CFGCMDS::readconfig(void) {
 bool CFGCMDS::getisvalid () {
 
   if (_config.frequency!=RF69_433MHZ && _config.frequency!=RF69_868MHZ && _config.frequency!=RF69_915MHZ)
-	return false;
-  else 
 	return true;
+  else 
+	return false;
   
 }
 
 byte CFGCMDS::getfrequency () {
-
-  return(_config.frequency);
-  
+  return(_config.frequency);  
 }
 
 byte CFGCMDS::getnodeID () {
-
   return(_config.nodeID);
-  
+}
+
+byte CFGCMDS::getisHW () {
+  return(_config.isHW);
+}
+
+byte CFGCMDS::getnetworkID () {
+  return(_config.networkID);
+}
+
+byte CFGCMDS::getradiopower () {
+  return(_config.radiopower);
+}
+
+byte CFGCMDS::getlisten100ms () {
+  return(_config.listen100ms);
+}
+
+char CFGCMDS::gettempcalibration () {
+  return(_config.tempcalibration);
+}
+
+byte CFGCMDS::getxmitmin () {
+  return(_config.xmitmin);
+}
+
+byte CFGCMDS::getxmitchange () {
+  return(_config.xmitchange);
+}
+
+char* CFGCMDS::getdescription () {
+  return(_config.description);
+}
+
+char* CFGCMDS::getencryptionKey () {
+  return(_config.encryptionKey);
 }
 
 // -------------------------------------------------SET functions ------
@@ -50,9 +82,10 @@ void  CFGCMDS::setdefaultconfig(byte nodeID) {
 	
 	_config.frequency=RF69_433MHZ;
 	_config.isHW=1;
-	_config.nodeID=nodeID;
+	//_config.nodeID=nodeID;
 	_config.networkID=10;
-	strcpy(_config.description,"general node");
+	strcpy(_config.description,"blank nde");
+	strcpy(_config.encryptionKey,"sampleEncryptKey");
 	_config.xmitmin=5;
 	_config.xmitchange=0;
 	_config.sleepseconds=10;
@@ -84,6 +117,12 @@ void  CFGCMDS::setisHW (byte isHW) {
 void  CFGCMDS::setnetworkID (byte networkID) {
 
   _config.networkID=networkID;
+  writeconfig();
+}
+
+void  CFGCMDS::setencryptionKey (char* description) {
+
+  strcpy(_config.encryptionKey,description);
   writeconfig();
 }
 
@@ -123,7 +162,7 @@ void  CFGCMDS::setlisten100ms (byte listen100ms) {
   writeconfig();
 }
 
-void  CFGCMDS::settempcalibration (byte tempcalibration) {
+void  CFGCMDS::settempcalibration (char tempcalibration) {
 
   _config.tempcalibration=tempcalibration;
   writeconfig();

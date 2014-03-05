@@ -24,22 +24,23 @@ void setup()
   Serial.begin(115200);
   EEPROM.readBlock(0, CONFIG);
   Serial.println("Reading nodeID from class:");
+  cfgcmds.readconfig();
   Serial.print(cfgcmds.getnodeID());
   Serial.println("Reading from local:");
   Serial.print(CONFIG.nodeID);
   
-  delay(5000);
+  //delay(5000);
   
-  Serial.println("Setting nodeid 22 into class");
-  cfgcmds.setnodeID(22);
-  Serial.println("Reading from local again:");
-  EEPROM.readBlock(0, CONFIG);
-  Serial.print(CONFIG.nodeID);
-  Serial.println("Reread from class");
-  cfgcmds.readconfig();
-  Serial.println("Reading nodeID  again from class:");
-  Serial.print(cfgcmds.getnodeID());
-  delay(5000);
+ // Serial.println("Setting nodeid 22 into class");
+ // cfgcmds.setnodeID(22);
+//  Serial.println("Reading from local again:");
+//  EEPROM.readBlock(0, CONFIG);
+//  Serial.print(CONFIG.nodeID);
+//  Serial.println("Reread from class");
+ // cfgcmds.readconfig();
+//  Serial.println("Reading nodeID  again from class:");
+//  Serial.print(cfgcmds.getnodeID());
+//  delay(5000);
   
   
   
@@ -49,23 +50,35 @@ void setup()
 
     
   
-  if (cfgcmds.getisvalid() ) // virgin CONFIG, expected [4,8,9]
+  if ( cfgcmds.getisvalid() ) // virgin CONFIG, expected [4,8,9]
   {
     Serial.println("No valid config found in EEPROM, writing defaults");
-    cfgcmds.setdefaultconfig(17);  //defaults set in cfgcmds library except nodeid set here
+    cfgcmds.setdefaultconfig(17);  //defaults set in cfgcmds library except nodeid set here    
+  }else {
+    Serial.print("nodeid: ");
+    Serial.println(cfgcmds.getnodeID());
+    Serial.print("networkid: ");
+    Serial.println(cfgcmds.getnetworkID());
+    Serial.print("key: ");
+    Serial.println(cfgcmds.getencryptionKey());
+    Serial.print("desc: ");
+    Serial.println(cfgcmds.getdescription());
+    Serial.print("xmitmin: ");
+    Serial.println(cfgcmds.getxmitmin());
+    Serial.print("xmitchange: ");
+    Serial.println(cfgcmds.getxmitchange());
+    Serial.print("sleepseconds: ");
+    Serial.println(cfgcmds.getradiopower());
+    Serial.print("listen: ");
+    Serial.println(cfgcmds.getlisten100ms());
+    Serial.print("tempcalib: ");
+    Serial.println(cfgcmds.gettempcalibration(),DEC);
     
-  CONFIG.reserved[0]=0;
-  CONFIG.xmitmin = 5; //xmit minimally atleast this many minutes default 5 mins
-  CONFIG.xmitchange = 1; //if 1 xmit when changes 0 wait for sleep timer for xmit use each bit for each piece of data
-  CONFIG.sleepseconds=10; //go back to sleep for this many seconds - node wakes up default every seconds. default 10 seconds  
-  CONFIG.radiopower=3;  //set default radio power to 3
-  CONFIG.listen100ms=5; // listen for how many 100 ms  after xmit
-  CONFIG.tempcalibration=-1;  //use this for radio temp sensor calib default -1
     
   }
   
-  EEPROM.readBlock<byte>(SYNC_EEPROM_ADDR, SYNC_TO, SYNC_MAX_COUNT);
-  EEPROM.readBlock<byte>(SYNC_EEPROM_ADDR+SYNC_MAX_COUNT, (byte *)SYNC_INFO, SYNC_MAX_COUNT*2); //int=2bytes so need to cast to byte array
+ // EEPROM.readBlock<byte>(SYNC_EEPROM_ADDR, SYNC_TO, SYNC_MAX_COUNT);
+  //EEPROM.readBlock<byte>(SYNC_EEPROM_ADDR+SYNC_MAX_COUNT, (byte *)SYNC_INFO, SYNC_MAX_COUNT*2); //int=2bytes so need to cast to byte array
   
   displayMainMenu();
 }
@@ -76,12 +89,12 @@ void displayMainMenu()
   Serial.println("-----------------------------------------------");
   Serial.println(" Moteino-RFM69 configuration setup utility");
   Serial.println("-----------------------------------------------");
-  Serial.print(" f - set frequency (current: ");Serial.print(CONFIG.frequency==RF69_433MHZ?"433":CONFIG.frequency==RF69_868MHZ?"868":"915");Serial.println("mhz)");
-  Serial.print(" i - set node ID (current: ");Serial.print(CONFIG.nodeID);Serial.println(")");
-  Serial.print(" n - set network ID (current: ");Serial.print(CONFIG.networkID);Serial.println(")");
-  Serial.print(" w - set RFM69 type (current: ");Serial.print(CONFIG.isHW?"HW":"W/CW");Serial.println(")");
-  Serial.print(" e - set encryption key (current: ");Serial.print(CONFIG.encryptionKey);Serial.println(")");
-  Serial.print(" d - set description (current: ");Serial.print(CONFIG.description);Serial.println(")");
+  Serial.print(" f - set frequency (current: ");Serial.print(cfgcmds.getfrequency()==RF69_433MHZ?"433":cfgcmds.getfrequency()==RF69_868MHZ?"868":"915");Serial.println("mhz)");
+  Serial.print(" i - set node ID (current: ");Serial.print(cfgcmds.getnodeID());Serial.println(")");
+  Serial.print(" n - set network ID (current: ");Serial.print(cfgcmds.getnetworkID());Serial.println(")");
+  Serial.print(" w - set RFM69 type (current: ");Serial.print(cfgcmds.getisHW()?"HW":"W/CW");Serial.println(")");
+  Serial.print(" e - set encryption key (current: ");Serial.print(cfgcmds.getencryptionKey());Serial.println(")");
+  Serial.print(" d - set description (current: ");Serial.print(cfgcmds.getdescription());Serial.println(")");
   Serial.println(" s - save CONFIG to EEPROM");
   Serial.println(" E - erase whole EEPROM - [0..1023]");
   Serial.print(" S - erase SYNC data [");Serial.print(SYNC_EEPROM_ADDR);Serial.print("..");Serial.print(SYNC_EEPROM_ADDR+3*SYNC_MAX_COUNT-1);Serial.print("]:[");
@@ -93,6 +106,7 @@ void displayMainMenu()
 
 char menu = 0;
 byte charsRead = 0;
+byte tempchar = 0;
 void handleMenuInput(char c)
 {
   switch(menu)
@@ -101,8 +115,8 @@ void handleMenuInput(char c)
       switch(c)
       {
         case 'f': Serial.print("\r\nEnter frequency (4 = 433mhz, 8=868mhz, 9=915mhz): "); menu=c; break;
-        case 'i': Serial.print("\r\nEnter node ID (1-255 + <ENTER>): "); CONFIG.nodeID=0;menu=c; break;
-        case 'n': Serial.print("\r\nEnter network ID (0-255 + <ENTER>): "); CONFIG.networkID=0; menu=c; break;
+        case 'i': Serial.print("\r\nEnter node ID (1-255 + <ENTER>): "); tempchar=0;menu=c; break;
+        case 'n': Serial.print("\r\nEnter network ID (0-255 + <ENTER>): "); tempchar=0; menu=c; break;
         case 'e': Serial.print("\r\nEnter encryption key (type 16 characters): "); menu=c; break;
         case 'w': Serial.print("\r\nIs this RFM69W/CW/HW (0=W/CW, 1=HW): "); menu=c; break;
         case 'd': Serial.print("\r\nEnter description (10 chars max + <ENTER>): "); menu=c; break;
@@ -127,20 +141,21 @@ void handleMenuInput(char c)
     case 'i':
       if (c >= '0' && c <= '9')
       {
-        if (CONFIG.nodeID * 10 + c - 48 <= 255)
+        if (tempchar * 10 + c - 48 <= 255)
         {
-          CONFIG.nodeID = CONFIG.nodeID * 10 + c - 48;
+          cfgcmds.setnodeID(tempchar * 10 + c - 48);
+          
           Serial.print(c);
         }
         else
         {
-          Serial.print(" - Set to ");Serial.println(CONFIG.nodeID);
+          Serial.print(" - Set to ");Serial.println(cfgcmds.getnodeID());
           menu=0;
         }
       }
       else if (c == 13 || c == 27)
       {
-        Serial.print(" - Set to ");Serial.println(CONFIG.nodeID);
+        Serial.print(" - Set to ");Serial.println(cfgcmds.getnodeID());
         displayMainMenu();
         menu=0;
       }
@@ -149,20 +164,20 @@ void handleMenuInput(char c)
     case 'n':
       if (c >= '0' && c <= '9')
       {
-        if (CONFIG.networkID * 10 + c - 48 <= 255)
+        if (tempchar * 10 + c - 48 <= 255)
         {
-          CONFIG.networkID = CONFIG.networkID * 10 + c - 48;
+          cfgcmds.setnetworkID(tempchar * 10 + c - 48);
           Serial.print(c);
         }
         else
         {
-          Serial.print(" - Set to ");Serial.println(CONFIG.networkID);
+          Serial.print(" - Set to ");Serial.println(cfgcmds.getnetworkID());
           menu=0;
         }
       }
       if (c == 13 || c == 27)
       {
-        Serial.print(" - Set to ");Serial.println(CONFIG.networkID);
+        Serial.print(" - Set to ");Serial.println(cfgcmds.getnetworkID());
         displayMainMenu();
         menu=0;
       }
@@ -205,8 +220,8 @@ void handleMenuInput(char c)
     case 'w':
       switch(c)
       {
-        case '0': Serial.println("Set to RFM69W\\CW"); CONFIG.isHW = 0; menu=0; break;
-        case '1': Serial.println("Set to RFM69HW"); CONFIG.isHW = 1; menu=0; break;
+        case '0': Serial.println("Set to RFM69W\\CW"); cfgcmds.setisHW(0); menu=0; break;
+        case '1': Serial.println("Set to RFM69HW"); cfgcmds.setisHW(1);; menu=0; break;
         case 27: displayMainMenu();menu=0;break;
       }
       break;

@@ -57,7 +57,7 @@
   byte sleepseconds; //go back to sleep for this many seconds - node wakes up default every second. default 10 seconds
   byte radiopower;  //set default radio power to 3
   byte listen100ms; // listen for how many 100 ms  after xmit default to 5
-  byte tempcalibration;  //use this for radio temp sensor calib default -1
+  char tempcalibration;  //use this for radio temp sensor calib default -1
   
 } Configuration;
 
@@ -76,26 +76,28 @@ class CFGCMDS {
 	void setisHW(byte isHW);
 	void setnodeID(byte nodeid);
 	void setnetworkID(byte networkID);
+	void setencryptionKey (char* description);
 	void setdescription (char* description);
 	void setxmitmin (byte xmitmin);
 	void setxmitchange(byte xmitchange);
 	void setsleepseconds(byte sleepseconds);
 	void setradiopower ( byte radiopower);
 	void setlisten100ms( byte listen100ms);
-	void settempcalibration ( byte tempcalibration );
+	void settempcalibration ( char tempcalibration );
 	
     bool getisvalid ( void );
 	byte getfrequency(void);
 	byte getisHW(void);
 	byte getnodeID(void);
 	byte getnetworkID(void);
+	char* getencryptionKey (void);
 	char* getdescription (void);
 	byte getxmitmin (void);
 	byte getxmitchange(void);
 	byte getsleepseconds(void);
 	byte getradiopower ( void);
 	byte getlisten100ms( void);
-	byte gettempcalibration ( void );
+	char gettempcalibration ( void );
 	
 };
 
