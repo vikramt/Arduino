@@ -49,16 +49,11 @@ void setup()
 
     
   
-  if (CONFIG.frequency!=RF69_433MHZ && CONFIG.frequency!=RF69_868MHZ && CONFIG.frequency!=RF69_915MHZ) // virgin CONFIG, expected [4,8,9]
+  if (cfgcmds.getisvalid() ) // virgin CONFIG, expected [4,8,9]
   {
     Serial.println("No valid config found in EEPROM, writing defaults");
-    CONFIG.separator1=CONFIG.separator2=CONFIG.seperator3=0;
-    CONFIG.frequency=RF69_433MHZ;
-    CONFIG.isHW=1;
-    CONFIG.nodeID=36;
-    CONFIG.networkID=10;
-    strcpy (CONFIG.encryptionKey,"sampleEncryptKey");
-    strcpy(CONFIG.description, "general node");
+    cfgcmds.setdefaultconfig(17);  //defaults set in cfgcmds library except nodeid set here
+    
   CONFIG.reserved[0]=0;
   CONFIG.xmitmin = 5; //xmit minimally atleast this many minutes default 5 mins
   CONFIG.xmitchange = 1; //if 1 xmit when changes 0 wait for sleep timer for xmit use each bit for each piece of data
