@@ -80,7 +80,7 @@ void setup() {
 void loop() 
 {
   
-  if ( doxmit )  // do this if if sleeptimer has countdown or minxmit has countdown 
+  if ( doxmit >0 )  // do this if if sleeptimer has countdown or minxmit has countdown 
   {     
         doxmit=0; // reset the flag
         cyclecounter=0 ; //reset the minxmit flag too
@@ -117,8 +117,9 @@ void loop()
          sendSize=strlen(payload);
          
          if (prevtemperature != temperature)      { datachanged|(1<<bit_temperature) ; prevtemperature = temperature; }
-         if (prevboltage     != boltage    )      { datachanged|(1<<bit_voltage) ;      prevboltage     = boltage;     }
-         if (prevdistance    != distance   )      { datachanged|(1<<bit_data0) ;       prevdistance    = distance;    } 
+         if (prevboltage     != boltage    )      { datachanged|(1<<bit_voltage) ;     prevboltage     = boltage;     }
+         if (prevdistance    != distance   )      { datachanged|(1<<bit_data0) ;       prevdistance    = distance;    }
+         
          
          if (radio.sendWithRetry(GATEWAYID, payload, sendSize))
             Serial.println(" ok ");
@@ -131,6 +132,19 @@ void loop()
           //
 //         radio.sleep();
 //         LowPower.powerDown(SLEEP_1S, ADC_OFF, BOD_OFF);
+
+          //  while ( !radio.receiveDone())
+          //  {
+          //      delay(1); // sleep here for some milliseconds
+          //
+          //      if (radio.ACK_REQUESTED)
+           //     {
+           //       radio.sendACK();
+           //       Serial.print(" - ACK sent");
+           //       delay(10);
+            //    }
+            //
+            //}
          
   }
   else  //came here since doxmit is false
@@ -138,12 +152,13 @@ void loop()
      // we came cause we did not enter previous loop - work on sleepseconds 
      if (sleepsecondscounter++ == sleepseconds) 
      {
-       doxmit=1;
+       doxmit=1;  //set xmit flag to transmit depending on xmitchange
        sleepsecondscounter=0;
      }
      if ( cyclecounter++ == cycle )
      {
-       doxmit=1; //set xmit flat - we will reset this counter in the xmit body
+       doxmit=2; //set xmit flag to must transmit - we will reset this counter in the xmit body
+       sleepsecondscounter=0; //if we xmit lets go back to sleep for sleepseconds
      }
      
      
