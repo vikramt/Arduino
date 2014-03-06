@@ -132,6 +132,8 @@ void loop()
           //
          //         radio.sleep();
         //         LowPower.powerDown(SLEEP_1S, ADC_OFF, BOD_OFF);
+		
+		// where to check receive
 
           //  while ( !radio.receiveDone())
           //  {
