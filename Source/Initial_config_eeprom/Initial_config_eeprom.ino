@@ -31,16 +31,16 @@ void setup()
   
   //delay(5000);
   
- // Serial.println("Setting nodeid 22 into class");
- // cfgcmds.setnodeID(22);
-//  Serial.println("Reading from local again:");
-//  EEPROM.readBlock(0, CONFIG);
-//  Serial.print(CONFIG.nodeID);
-//  Serial.println("Reread from class");
- // cfgcmds.readconfig();
-//  Serial.println("Reading nodeID  again from class:");
-//  Serial.print(cfgcmds.getnodeID());
-//  delay(5000);
+  // Serial.println("Setting nodeid 22 into class");
+  // cfgcmds.setnodeID(22);
+  //  Serial.println("Reading from local again:");
+  //  EEPROM.readBlock(0, CONFIG);
+  //  Serial.print(CONFIG.nodeID);
+  //  Serial.println("Reread from class");
+  // cfgcmds.readconfig();
+  //  Serial.println("Reading nodeID  again from class:");
+  //  Serial.print(cfgcmds.getnodeID());
+  //  delay(5000);
   
   
   
@@ -52,32 +52,34 @@ void setup()
   
   if ( cfgcmds.getisvalid() ) // virgin CONFIG, expected [4,8,9]
   {
-    Serial.println("No valid config found in EEPROM, writing defaults");
-    cfgcmds.setdefaultconfig(17);  //defaults set in cfgcmds library except nodeid set here    
-  }else {
-    Serial.print("nodeid: ");
-    Serial.println(cfgcmds.getnodeID());
-    Serial.print("networkid: ");
-    Serial.println(cfgcmds.getnetworkID());
-    Serial.print("key: ");
-    Serial.println(cfgcmds.getencryptionKey());
-    Serial.print("desc: ");
-    Serial.println(cfgcmds.getdescription());
-    Serial.print("xmitmin: ");
-    Serial.println(cfgcmds.getxmitmin());
-    Serial.print("xmitchange: ");
-    Serial.println(cfgcmds.getxmitchange());
-    Serial.print("sleepseconds: ");
-    Serial.println(cfgcmds.getradiopower());
-    Serial.print("listen: ");
-    Serial.println(cfgcmds.getlisten100ms());
-    Serial.print("tempcalib: ");
-    Serial.println(cfgcmds.gettempcalibration(),DEC);
-    
-    
+	  Serial.println("No valid config found in EEPROM, writing defaults");
+	  cfgcmds.setdefaultconfig(17);  //defaults set in cfgcmds library except nodeid set here    
+  }
+  else 
+  {
+	  Serial.print("nodeid: ");
+	  Serial.println(cfgcmds.getnodeID());
+	  Serial.print("networkid: ");
+	  Serial.println(cfgcmds.getnetworkID());
+	  Serial.print("key: ");
+	  Serial.println(cfgcmds.getencryptionKey());
+	  Serial.print("desc: ");
+	  Serial.println(cfgcmds.getdescription());
+	  Serial.print("xmitmin: ");
+	  Serial.println(cfgcmds.getxmitmin());
+	  Serial.print("xmitchange: ");
+	  Serial.println(cfgcmds.getxmitchange());
+	  Serial.print("sleepseconds: ");
+	  Serial.println(cfgcmds.getradiopower());
+	  Serial.print("listen: ");
+	  Serial.println(cfgcmds.getlisten100ms());
+	  Serial.print("tempcalib: ");
+	  Serial.println(cfgcmds.gettempcalibration(),DEC);
+  
+  
   }
   
- // EEPROM.readBlock<byte>(SYNC_EEPROM_ADDR, SYNC_TO, SYNC_MAX_COUNT);
+  // EEPROM.readBlock<byte>(SYNC_EEPROM_ADDR, SYNC_TO, SYNC_MAX_COUNT);
   //EEPROM.readBlock<byte>(SYNC_EEPROM_ADDR+SYNC_MAX_COUNT, (byte *)SYNC_INFO, SYNC_MAX_COUNT*2); //int=2bytes so need to cast to byte array
   
   displayMainMenu();
@@ -114,17 +116,17 @@ void handleMenuInput(char c)
     case 0:
       switch(c)
       {
-        case 'f': Serial.print("\r\nEnter frequency (4 = 433mhz, 8=868mhz, 9=915mhz): "); menu=c; break;
-        case 'i': Serial.print("\r\nEnter node ID (1-255 + <ENTER>): "); tempchar=0;menu=c; break;
-        case 'n': Serial.print("\r\nEnter network ID (0-255 + <ENTER>): "); tempchar=0; menu=c; break;
-        case 'e': Serial.print("\r\nEnter encryption key (type 16 characters): "); menu=c; break;
-        case 'w': Serial.print("\r\nIs this RFM69W/CW/HW (0=W/CW, 1=HW): "); menu=c; break;
-        case 'd': Serial.print("\r\nEnter description (10 chars max + <ENTER>): "); menu=c; break;
-        case 's': Serial.print("\r\nCONFIG saved to EEPROM!"); EEPROM.writeBlock(0, CONFIG); break;
-        case 'E': Serial.print("\r\nErasing EEPROM ... "); menu=c; break;
-        case 'S': Serial.print("\r\nErasing SYNC EEPROM ... "); menu=c; break;
-        case 'r': Serial.print("\r\nRebooting"); resetUsingWatchdog(1); break;
-        case 27: displayMainMenu();menu=0;break;
+      case 'f': Serial.print("\r\nEnter frequency (4 = 433mhz, 8=868mhz, 9=915mhz): "); menu=c; break;
+      case 'i': Serial.print("\r\nEnter node ID (1-255 + <ENTER>): "); tempchar=0;menu=c; break;
+      case 'n': Serial.print("\r\nEnter network ID (0-255 + <ENTER>): "); tempchar=0; menu=c; break;
+      case 'e': Serial.print("\r\nEnter encryption key (type 16 characters): "); menu=c; break;
+      case 'w': Serial.print("\r\nIs this RFM69W/CW/HW (0=W/CW, 1=HW): "); menu=c; break;
+      case 'd': Serial.print("\r\nEnter description (10 chars max + <ENTER>): "); menu=c; break;
+      case 's': Serial.print("\r\nCONFIG saved to EEPROM!"); EEPROM.writeBlock(0, CONFIG); break;
+      case 'E': Serial.print("\r\nErasing EEPROM ... "); menu=c; break;
+      case 'S': Serial.print("\r\nErasing SYNC EEPROM ... "); menu=c; break;
+      case 'r': Serial.print("\r\nRebooting"); resetUsingWatchdog(1); break;
+      case 27: displayMainMenu();menu=0;break;
       }
       break;
       
