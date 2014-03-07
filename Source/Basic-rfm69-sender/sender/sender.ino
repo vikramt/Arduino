@@ -160,3 +160,17 @@ void Blink(byte PIN, int DELAY_MS)
   delay(DELAY_MS);
   digitalWrite(PIN,LOW);
 }
+
+// reads a line feed (\n) terminated line from the serial stream
+// returns # of bytes read, up to 255
+// timeout in ms, will timeout and return after so long
+byte readSerialLine(char* input, char endOfLineChar, byte maxLength, uint16_t timeout)
+{
+  byte inputLen = 0;
+  Serial.setTimeout(timeout);
+  inputLen = Serial.readBytesUntil(endOfLineChar, input, maxLength);
+  input[inputLen]=0;//null-terminate it
+  Serial.setTimeout(0);
+  //Serial.println();
+  return inputLen;
+}

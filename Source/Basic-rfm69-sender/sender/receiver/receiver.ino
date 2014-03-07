@@ -123,6 +123,7 @@ void loop() {
       // When a node requests an ACK, respond to the ACK
       // and also send a packet requesting an ACK (every 3rd one only)
       // This way both TX/RX NODE functions are tested on 1 end at the GATEWAY
+      
       if (ackCount++%3==0)
       {
         Serial.print(" Pinging node ");
@@ -147,4 +148,18 @@ void Blink(byte PIN, int DELAY_MS)
   digitalWrite(PIN,HIGH);
   delay(DELAY_MS);
   digitalWrite(PIN,LOW);
+}
+
+// reads a line feed (\n) terminated line from the serial stream
+// returns # of bytes read, up to 255
+// timeout in ms, will timeout and return after so long at 9600bps 1ms per byte
+byte readSerialLine(char* input, char endOfLineChar, byte maxLength, uint16_t timeout)
+{
+  byte inputLen = 0;
+  Serial.setTimeout(timeout);
+  inputLen = Serial.readBytesUntil(endOfLineChar, input, maxLength);
+  input[inputLen]=0;//null-terminate it
+  Serial.setTimeout(0);
+  //Serial.println();
+  return inputLen;
 }
