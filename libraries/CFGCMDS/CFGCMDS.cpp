@@ -21,9 +21,9 @@ bool  CFGCMDS::readconfig(void) {
 bool CFGCMDS::getisvalid () {
 
   if (_config.frequency!=RF69_433MHZ && _config.frequency!=RF69_868MHZ && _config.frequency!=RF69_915MHZ)
-	return true;
-  else 
 	return false;
+  else 
+	return true;
   
 }
 

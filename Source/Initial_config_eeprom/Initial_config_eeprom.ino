@@ -57,6 +57,8 @@ void setup()
   }
   else 
   {
+	  Serial.print("Frequency: ");
+	  Serial.println(cfgcmds.getfrequency());
 	  Serial.print("nodeid: ");
 	  Serial.println(cfgcmds.getnodeID());
 	  Serial.print("networkid: ");

@@ -1,5 +1,9 @@
-#include <RFM69.h>
-#include <RFM69registers.h>
+#include <EEPROMex.h> //get it here: http://playground.arduino.cc/Code/EEPROMex
+#include <SPI.h>
+#include <RFM69.h> //get it here: http://github.com/lowpowerlab/rfm69
+#include <SPIFlash.h> //get it here: http://github.com/lowpowerlab/spiflash
+#include <avr/wdt.h> //comes with Arduino
+#include <CFGCMDS.h>
 
 // Sample RFM69 sender/node sketch, with ACK and optional encryption
 // Sends periodic messages of increasing length to gateway (id=1)
@@ -7,9 +11,10 @@
 // Library and code by Felix Rusu - felix@lowpowerlab.com
 // Get the RFM69 and SPIFlash library at: https://github.com/LowPowerLab/
 
-#include <RFM69.h>
-#include <SPI.h>
-#include <SPIFlash.h>
+
+CFGCMDS cfgcmds; //instantiate the class
+
+
 
 #define NODEID 2 //unique for each node on same network
 #define NETWORKID 10 //the same on all nodes that talk to each other
@@ -36,28 +41,20 @@ void setup() {
   Serial.begin(SERIAL_BAUD);
   
   delay(255);delay(255);delay(255);delay(255);delay(255);delay(255);delay(255);delay(255);
-  Serial.println("wu");
-  delay(255);delay(255);delay(255);delay(255);
-  Serial.println("wu 2");
-  delay(255);delay(255);delay(255);delay(255);delay(255);
-  
-  radio.initialize(FREQUENCY,NODEID,NETWORKID);
-#ifdef IS_RFM69HW
-  radio.setHighPower(); //uncomment only for RFM69HW!
-#endif
-  radio.setHighPower();
-  radio.setPowerLevel(5);
-  radio.encrypt(ENCRYPTKEY);
-  char buff[50];
-  sprintf(buff, "\nTransmitting at %d Mhz...", FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
-  
-  
-  
-  Serial.println(buff);
-  
-  delay(255);delay(255);delay(255);delay(255);
-  Serial.println("wu 3");
-  
+
+    if ( cfgcmds.getisvalid() )     {
+            
+            radio.initialize(cfgcmds.getfrequency(),cfgcmds.getnodeID(), cfgcmds.getnetworkID()); 
+            radio.encrypt(cfgcmds.getencryptionKey())    ;                           
+            if (cfgcmds.getisHW() )   { radio.setHighPower(cfgcmds.getradiopower()); } 
+            
+    } else {
+    
+            Serial.println("No valid config found in EEPROM, not writing defaults");
+            delay(5000);
+    }
+    
+ 
 }
 
 long lastPeriod = -1;
