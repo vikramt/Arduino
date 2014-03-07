@@ -19,27 +19,58 @@
 
 
 //Commands magic numbers are below
-#define ConfigRead 100
-#define ConfigWrite 101
-#define DataRead	110
-#define DataWrite	111
-#define Reboot		126
-#define TEMP	51
-#define VOLTAGE 52
-#define	DATA0	53
-#define DATA1	54
-#define	DATA2	55
-#define DATA3	56
-#define DATA4	57
-#define DATA5	58
-#define DATA6	59
-#define DATA7	60
-#define DATA8	61
+
+#define Reboot				126
+#define READtemp			18
+#define READvoltage 		19
+#define	READdata0			20
+#define READdata1			21
+#define	READdata2			22
+#define READdata3			23
+#define READdata4			24
+#define READdata5			25
+#define READdata6			26
+#define READreserve			27
+
+#define READCONFIGreq		28   // can only request the full configs for reading
+#define READCONFIGresp		29	//slave sends readconfigresponse as teh first byte
+
+#define	WRITEdata0			30
+#define WRITEdata1			31
+#define	WRITEdata2			32
+#define WRITEdata3			33
+#define WRITEdata4			34
+#define WRITEdata5			35
+#define WRITEdata6			36
+
+
+#define WRITEnodeidreq			40
+#define WRITExmitminreq			41
+#define WRITExmitchangereq		42
+#define WRITEsleepsecondsreq	43
+#define WRITEradiopowerreq		44
+#define WRITElisten100msreq		45
+#define WRITEtempcalibrationreq	46
+
+
+
+
 
 #define SYNC_MAX_COUNT 10 //max number of other nodes to SYNC with, keep the same with same setting in SwitchMote sketch!
 #define SYNC_EEPROM_ADDR 512 //SYNC_TO and SYNC_INFO data starts at this EEPROM address
 
+ typedef struct  {
+  byte nodeID;
+  byte readrequest;
 
+} READREQUEST;
+
+ typedef struct  {
+  byte nodeID;
+  byte writerequest;
+  byte writeparameter ;
+
+} WRITEREQUEST;
 
  typedef struct  {
   byte frequency;
