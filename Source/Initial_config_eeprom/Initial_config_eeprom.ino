@@ -25,32 +25,13 @@ void setup()
   EEPROM.readBlock(0, CONFIG);
   Serial.println("Reading nodeID from class:");
   cfgcmds.readconfig();
-  Serial.print(cfgcmds.getnodeID());
+  Serial.println(cfgcmds.getfrequency());
+  Serial.println(cfgcmds.getnodeID());
+  Serial.println(cfgcmds.getdescription());
   Serial.println("Reading from local:");
   Serial.print(CONFIG.nodeID);
-  
-  //delay(5000);
-  
-  // Serial.println("Setting nodeid 22 into class");
-  // cfgcmds.setnodeID(22);
-  //  Serial.println("Reading from local again:");
-  //  EEPROM.readBlock(0, CONFIG);
-  //  Serial.print(CONFIG.nodeID);
-  //  Serial.println("Reread from class");
-  // cfgcmds.readconfig();
-  //  Serial.println("Reading nodeID  again from class:");
-  //  Serial.print(cfgcmds.getnodeID());
-  //  delay(5000);
-  
-  
-  
-  
-  
 
-
-    
-  
-  if ( cfgcmds.getisvalid() ) // virgin CONFIG, expected [4,8,9]
+  if ( ! cfgcmds.getisvalid() ) // virgin CONFIG, expected [4,8,9]
   {
 	  Serial.println("No valid config found in EEPROM, writing defaults");
 	  cfgcmds.setdefaultconfig(17);  //defaults set in cfgcmds library except nodeid set here    
@@ -215,7 +196,9 @@ void handleMenuInput(char c)
       }
       if (charsRead>=10 || c == 13 || c == 27)
       {
-        //Serial.print(" - Set to [");Serial.print(CONFIG.description);Serial.println(']');
+        cfgcmds.setdescription(CONFIG.description);
+		Serial.print(" - Set to [");Serial.print(cfgcmds.getdescription());
+		Serial.println(']');
         Serial.println(" - DONE");
         displayMainMenu();menu=0;charsRead=0;
       }

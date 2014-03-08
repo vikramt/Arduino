@@ -120,9 +120,9 @@ void  CFGCMDS::setnetworkID (byte networkID) {
   writeconfig();
 }
 
-void  CFGCMDS::setencryptionKey (char* description) {
+void  CFGCMDS::setencryptionKey (char* encryptionkey) {
 
-  strcpy(_config.encryptionKey,description);
+  strcpy(_config.encryptionKey,encryptionkey);
   writeconfig();
 }
 
