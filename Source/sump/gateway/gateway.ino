@@ -159,6 +159,11 @@ void loop() {
 		    Serial.print("Sending to node : "); Serial.println(sendRequest.nodeID);
 		    Serial.print ("Command is  "); Serial.println(sendRequest.command);
 			Serial.print ("Parameter is  "); Serial.println(sendRequest.parameter);
+			//transmit the packet
+			if (radio.sendWithRetry(sendRequest.nodeID, &sendRequest, sizeof(sendRequest) ) )
+				Serial.print("Sent and acked  ok!");
+			else 
+				Serial.print(" Unable to  trasmit ...");
 			
 		  } else {
 
@@ -167,6 +172,17 @@ void loop() {
 	  }
     }
 }  //*************** loop end ********************/
+
+bool Transmit ( void )  {
+
+// using global sendRequest;
+	
+	if (radio.sendWithRetry(sendRequest.nodeID, &sendRequest, sizeof(sendRequest) ) )
+        Serial.print("sent and acked  ok!");
+    else Serial.print(" Unable to  trasmit ...");
+	
+}
+
 void Blink(byte PIN, int DELAY_MS)
 {
   pinMode(PIN, OUTPUT);
