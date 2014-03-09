@@ -23,8 +23,9 @@ CFGCMDS cfgcmds; //instantiate the class
 #define LED 9 // Moteinos have LEDs on D9
 #define SERIAL_BAUD 115200
 
-static char payload[64]=             { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-static char serialInputBuffer[32] =  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+static char payload[32]=             	{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+static char radioBuffer[32]= 			{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+static char serialInputBuffer[32] =  	{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 
 RFM69 radio;
@@ -104,10 +105,9 @@ void loop() {
         Serial.print("to [");Serial.print(radio.TARGETID, DEC);Serial.print("] ");
       }
 
-      for (byte i = 0; i < radio.DATALEN; i++) {
-       sprintf(payload,Serial.print((char)radio.DATA[i]);		
-	  }
-	  Serial.println(payload);
+	  //copy the radio data serial port 
+	  strcpy(radioBuffer,(char*)radio.DATA);
+	  Serial.print(radioBuffer);
       Serial.print(" [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
       
       if (radio.ACK_REQUESTED)
@@ -122,7 +122,7 @@ void loop() {
       // Blink(LED,3);
     }
 	
-	// after receive done check serial and transmit if command ready   or serial
+	// after receive done check serial buffer and transmit if command ready   or serial
 	// do a bitmap of which nodes have command or just loop ? loop will imply priority
 	// transmitimmediate via serial command or wait after node checks in logic should be in pc
 	// gateway will just transmit when its sent serial commands.
@@ -147,14 +147,26 @@ void loop() {
 	
 	if (serialInputBuffer[0] == 'S')
     {
-      byte temperature = radio.readTemperature(-1); // -1 = user cal factor, adjust for correct ambient
-      byte fTemp = 1.8 * temperature + 32; // 9/5=1.8
-      Serial.print( "Radio Temp is ");
-      Serial.print(temperature);
-      Serial.print("C, ");
-      Serial.print(fTemp); //converting to F loses some resolution, obvious when C is on edge between 2 values (ie 26C=78F, 27C=80F)
-      Serial.println('F');
-      serialInputBuffer[0]=0; //command completed
+	  byte i;
+	  byte toNode= 0;
+	  char field[4] ={0,0,0,0};	
+      payload[0]==0;
+	  // next char is a :
+	  if ( serialInputBuffer[1]==':' ) {
+		  i=0;
+		  while ( serialInputBuffer[i+2] != ',' && i < 3 ) {
+			payload[i] = serialInputBuffer[i+2];
+			i++;
+		  }
+		  payload[i]=0;
+		  toNode = atoi(payload);
+		  payload[0]=0;
+		  strcpy(payload,&serialInputBuffer[2]);
+		  Serial.print("Sending to node : "); Serial.print(toNode);
+		  Serial.print ("payload is "); Serial.println(payload);
+	  
+	  
+	  }
     }
 	
 	
