@@ -32,8 +32,9 @@
 #define READdata6			26
 #define READreserve			27
 
-#define READCONFIGreq		28   // can only request the full configs for reading
-#define READCONFIGresp		29	//slave sends readconfigresponse as teh first byte
+#define READconfigreq		28   // can only request the full configs for reading
+#define READconfigresp		254	//slave sends readconfigresponse as teh first byte so gateway knows its config response and not normal data
+
 
 #define	WRITEdata0			30
 #define WRITEdata1			31
@@ -59,18 +60,13 @@
 #define SYNC_MAX_COUNT 10 //max number of other nodes to SYNC with, keep the same with same setting in SwitchMote sketch!
 #define SYNC_EEPROM_ADDR 512 //SYNC_TO and SYNC_INFO data starts at this EEPROM address
 
- typedef struct  {
-  byte nodeID;
-  byte readrequest;
-
-} READREQUEST;
 
  typedef struct  {
   byte nodeID;
-  byte writerequest;
-  byte writeparameter ;
+  byte command;
+  byte parameter ;
 
-} WRITEREQUEST;
+} REQUEST;
 
  typedef struct  {
   byte frequency;
