@@ -134,18 +134,19 @@ void loop() {
     }
   }
 
-  //check for any received packets
+  //check for any received packets S:2,77,99
   if (radio.receiveDone())
   {
     Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");
     for (byte i = 0; i < radio.DATALEN; i++)
       Serial.print(radio.DATA[i]);
-	  
-	if ( radio.DATA[0] == cfgcmds.getnodeID() ) {
-		
-		Serial.print("command is : "); Serial.println(radio.DATA[1]);
-		Serial.print("parameter is :"); Serial.println(radio.DATA[2]);
-	}
+        if ( radio.DATALEN > 0 ) { //check for datalen cause it maybe just an ACK request etc and radio.data maybe stale
+            if ( radio.DATA[0] == cfgcmds.getnodeID()  ) {
+            
+                Serial.print("command is : "); Serial.println(radio.DATA[1]);
+                Serial.print("parameter is :"); Serial.println(radio.DATA[2]);
+            }
+        }
     Serial.print(" [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
 
     if (radio.ACK_REQUESTED)
