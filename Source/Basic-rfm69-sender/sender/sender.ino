@@ -75,6 +75,7 @@ void setup() {
 		radio.setHighPower(); //uncomment only for RFM69HW!
 	}	
 	radio.encrypt(cfgcmds.getencryptionKey());
+	radio.setPowerLevel(cfgcmds.getradiopower());
 	if (flash.initialize()) {
 		Serial.println("SPI Flash Init OK!");
 	}
