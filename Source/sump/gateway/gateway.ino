@@ -16,7 +16,7 @@ REQUEST sendRequest ;
 ////#define FREQUENCY RF69_915MHZ
 //#define ENCRYPTKEY "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
 //#define IS_RFM69HW 
-#define ACK_TIME 30 // max # of ms to wait for an ack
+#define ACK_TIME 50 // max # of ms to wait for an ack
 #define LED 9 // Moteinos have LEDs on D9
 #define SERIAL_BAUD 115200
 static char payload[32]=             	{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -62,7 +62,10 @@ void setup() {
 	if ( cfgcmds.getisHW() ) {
 		radio.setHighPower(); //uncomment only for RFM69HW!
 	}	
+    
 	radio.encrypt(cfgcmds.getencryptionKey());
+    radio.setPowerLevel(cfgcmds.getradiopower());
+    
 	if (flash.initialize()) {
 		Serial.println("SPI Flash Init OK!");
 	}
