@@ -29,7 +29,7 @@ CFGCMDS cfgcmds; //instantiate the class
 #define LED 9 // Moteinos have LEDs on D9
 #define SERIAL_BAUD 115200
 
-int TRANSMITPERIOD = 1900; //transmit a packet to gateway so often (in ms)
+int TRANSMITPERIOD = 3900; //transmit a packet to gateway so often (in ms)
 char payload[] = "123 ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 char buff[20];
 byte sendSize=0;
@@ -38,23 +38,50 @@ SPIFlash flash(8, 0xEF30); //EF40 for 16mbit windbond chip
 RFM69 radio;
 
 void setup() {
-  Serial.begin(SERIAL_BAUD);
-  
-  delay(255);delay(255);delay(255);delay(255);delay(255);delay(255);delay(255);delay(255);
-
-    if ( cfgcmds.getisvalid() )     {
-            
-            radio.initialize(cfgcmds.getfrequency(),cfgcmds.getnodeID(), cfgcmds.getnetworkID()); 
-            radio.encrypt(cfgcmds.getencryptionKey())    ;                           
-            if (cfgcmds.getisHW() )   { radio.setHighPower(cfgcmds.getradiopower()); } 
-            
-    } else {
-    
-            Serial.println("No valid config found in EEPROM, not writing defaults");
-            delay(5000);
-    }
-    
- 
+ 	delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);
+	Serial.begin(SERIAL_BAUD);
+	delay(10);
+	if ( ! cfgcmds.getisvalid() ) // virgin CONFIG, expected [4,8,9]
+	{
+		while (1 ) {
+			Serial.println("No valid config found in EEPROM, NOT writing defaults");
+		}
+	}
+	else 
+	{
+		Serial.print("Frequency: ");
+		Serial.println(cfgcmds.getfrequency());
+		Serial.print("nodeid: ");
+		Serial.println(cfgcmds.getnodeID());
+		Serial.print("networkid: ");
+		Serial.println(cfgcmds.getnetworkID());
+		Serial.print("key: ");
+		Serial.println(cfgcmds.getencryptionKey());
+		Serial.print("desc: ");
+		Serial.println(cfgcmds.getdescription());
+		Serial.print("xmitmin: ");
+		Serial.println(cfgcmds.getxmitmin());
+		Serial.print("xmitchange: ");
+		Serial.println(cfgcmds.getxmitchange());
+		Serial.print("sleepseconds: ");
+		Serial.println(cfgcmds.getradiopower());
+		Serial.print("listen: ");
+		Serial.println(cfgcmds.getlisten100ms());
+		Serial.print("tempcalib: ");
+		Serial.println(cfgcmds.gettempcalibration(),DEC);
+	}
+	radio.initialize(cfgcmds.getfrequency(),cfgcmds.getnodeID(),cfgcmds.getnetworkID());
+	if ( cfgcmds.getisHW() ) {
+		radio.setHighPower(); //uncomment only for RFM69HW!
+	}	
+	radio.encrypt(cfgcmds.getencryptionKey());
+	if (flash.initialize()) {
+		Serial.println("SPI Flash Init OK!");
+	}
+	else {
+		Serial.println("SPI Flash Init fail - no chip?");
+	}
+	Serial.print("Starting:"); Serial.println(cfgcmds.getdescription());
 }
 
 long lastPeriod = -1;
@@ -110,8 +137,12 @@ void loop() {
   if (radio.receiveDone())
   {
     Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");
-    for (byte i = 0; i < radio.DATALEN; i++)
-      Serial.print((char)radio.DATA[i]);
+    //for (byte i = 0; i < radio.DATALEN; i++)
+    //  Serial.print(radio.DATA[i]);
+	if ( radio.DATA[0] == cfgcmds.getnodeID() ) {
+		Serial.print("command is : "); Serial.println(radio.DATA[1]);
+		Serial.print("parameter is :"); Serial.println(radio.DATA[2]);
+	}
     Serial.print(" [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
 
     if (radio.ACK_REQUESTED)

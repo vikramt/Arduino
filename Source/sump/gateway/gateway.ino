@@ -156,6 +156,7 @@ void loop() {
 			sendRequest.parameter = 0;
 		  }
 		  if ( requestgood > 1 ) {
+			requestgood=0;
 		    Serial.print("Sending to node : "); Serial.println(sendRequest.nodeID);
 		    Serial.print ("Command is  "); Serial.println(sendRequest.command);
 			Serial.print ("Parameter is  "); Serial.println(sendRequest.parameter);
