@@ -138,9 +138,11 @@ void loop() {
   if (radio.receiveDone())
   {
     Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");
-    //for (byte i = 0; i < radio.DATALEN; i++)
-    //  Serial.print(radio.DATA[i]);
+    for (byte i = 0; i < radio.DATALEN; i++)
+      Serial.print(radio.DATA[i]);
+	  
 	if ( radio.DATA[0] == cfgcmds.getnodeID() ) {
+		
 		Serial.print("command is : "); Serial.println(radio.DATA[1]);
 		Serial.print("parameter is :"); Serial.println(radio.DATA[2]);
 	}
@@ -152,6 +154,7 @@ void loop() {
       Serial.print(" - ACK sent");
       delay(10);
     }
+	radio.sleep();
     Blink(LED,5);
     Serial.println();
   }
@@ -175,7 +178,7 @@ void loop() {
     for(byte i = 0; i < sendSize; i++)
       Serial.print((char)payload[i]);
 
-    if (radio.sendWithRetry(GATEWAYID, payload, sendSize))
+    if (radio.sendWithRetry(GATEWAYID, payload, sendSize,2,30))
      Serial.print(" ok!");
     else Serial.print(" nothing...");
 

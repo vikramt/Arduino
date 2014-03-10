@@ -164,10 +164,10 @@ void loop() {
 		    Serial.print ("Command is  "); Serial.println(sendRequest.command);
 			Serial.print ("Parameter is  "); Serial.println(sendRequest.parameter);
 			//transmit the packet
-			if (radio.sendWithRetry(sendRequest.nodeID, &sendRequest, sizeof(sendRequest) ) )
+			if (radio.sendWithRetry(sendRequest.nodeID, &sendRequest, sizeof(sendRequest),2,30 ) )
 				Serial.print("Sent and acked  ok!");
 			else 
-				Serial.print(" Unable to  trasmit ...");
+				Serial.print(" Unable to  transmit ...");
 			
 		  } else {
 

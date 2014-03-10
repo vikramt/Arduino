@@ -23,7 +23,7 @@
 
 RFM69 radio;
 SPIFlash flash(8, 0xEF30); //EF40 for 16mbit windbond chip
-bool promiscuousMode = false; //set to 'true' to sniff all packets on the same network
+bool promiscuousMode = true; //set to 'true' to sniff all packets on the same network
 long rcount =0 ;
 
 void setup() {
