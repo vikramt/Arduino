@@ -25,6 +25,7 @@ static char serialInputBuffer[32] =  	{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 RFM69 radio;
 SPIFlash flash(8, 0xEF30); //EF40 for 16mbit windbond chip
 bool promiscuousMode = false; //set to 'true' to sniff all packets on the same network
+
 void setup() {
 	delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);
 	Serial.begin(SERIAL_BAUD);
@@ -74,10 +75,12 @@ void setup() {
 	}
 	Serial.print("Starting:"); Serial.println(cfgcmds.getdescription());
 }
+
+
 void loop() {
 	//get any serial input
 	//readSerialLine(char* input, char endOfLineChar=10, byte maxLength=32, uint16_t timeout=1000);
-	byte inputLen = readSerialLine(serialInputBuffer, ';', 32, 100); 
+	byte inputLen = readSerialLine(serialInputBuffer, ';', 32, 10); 
     if (radio.receiveDone())
     {
       Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");
@@ -177,15 +180,7 @@ void loop() {
     }
 }  //*************** loop end ********************/
 
-bool Transmit ( void )  {
 
-// using global sendRequest;
-	
-	if (radio.sendWithRetry(sendRequest.nodeID, &sendRequest, sizeof(sendRequest) ) )
-        Serial.print("sent and acked  ok!");
-    else Serial.print(" Unable to  trasmit ...");
-	
-}
 
 void Blink(byte PIN, int DELAY_MS)
 {
@@ -207,3 +202,5 @@ byte readSerialLine(char* input, char endOfLineChar, byte maxLength, uint16_t ti
   //Serial.println();
   return inputLen;
 }
+
+

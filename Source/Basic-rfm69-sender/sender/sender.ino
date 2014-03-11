@@ -29,13 +29,14 @@ CFGCMDS cfgcmds; //instantiate the class
 #define LED 9 // Moteinos have LEDs on D9
 #define SERIAL_BAUD 115200
 
-int TRANSMITPERIOD = 3900; //transmit a packet to gateway so often (in ms)
+int TRANSMITPERIOD = 900; //transmit a packet to gateway so often (in ms)
 char payload[] = "123 ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 char buff[20];
 byte sendSize=0;
 boolean requestACK = false;
 SPIFlash flash(8, 0xEF30); //EF40 for 16mbit windbond chip
 RFM69 radio;
+REQUEST recvRequest;
 
 void setup() {
  	delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);
@@ -141,11 +142,13 @@ void loop() {
     for (byte i = 0; i < radio.DATALEN; i++)
       Serial.print(radio.DATA[i]);
         if ( radio.DATALEN > 0 ) { //check for datalen cause it maybe just an ACK request etc and radio.data maybe stale
+            memset( &recvRequest,0,sizeof(recvRequest)); // can we zero the request like this
             if ( radio.DATA[0] == cfgcmds.getnodeID()  ) {
-            
-                Serial.print("command is : "); Serial.println(radio.DATA[1]);
-                Serial.print("parameter is :"); Serial.println(radio.DATA[2]);
+                memcpy(&recvRequest,(void*) &radio.DATA,sizeof(recvRequest)); 
+                Serial.print("command is : "); Serial.println(recvRequest.command);
+                Serial.print("parameter is :"); Serial.println(recvRequest.parameter);
             }
+            
         }
     Serial.print(" [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
 
@@ -153,9 +156,9 @@ void loop() {
     {
       radio.sendACK();
       Serial.print(" - ACK sent");
-      delay(10);
+      delay(1);
     }
-	radio.sleep();
+	//radio.sleep();////
     Blink(LED,5);
     Serial.println();
   }
@@ -179,9 +182,11 @@ void loop() {
     for(byte i = 0; i < sendSize; i++)
       Serial.print((char)payload[i]);
 
-    if (radio.sendWithRetry(GATEWAYID, payload, sendSize,2,30))
-     Serial.print(" ok!");
-    else Serial.print(" nothing...");
+    //if (radio.sendWithRetry(GATEWAYID, payload, sendSize,1,30))
+    radio.send(GATEWAYID, payload, sendSize,0);
+     //  Serial.print(" ok!");
+    //else 
+    //   Serial.print(" nothing...");
 
     sendSize = (sendSize + 1) % 31;
     Serial.println();

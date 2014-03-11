@@ -167,3 +167,12 @@ void  CFGCMDS::settempcalibration (char tempcalibration) {
   _config.tempcalibration=tempcalibration;
   writeconfig();
 }
+
+
+void WDTReboot()
+{
+  wdt_enable(WDTO_15MS);
+  while(1)
+  {
+  }
+}

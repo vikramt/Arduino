@@ -6,6 +6,7 @@
 #include <wiring.h>
 #include "pins_arduino.h"
 #endif
+#include <avr/wdt.h>
 
 // bit position for bitchanged configuration
 #define bit_temperature 0
@@ -59,6 +60,8 @@
 
 #define SYNC_MAX_COUNT 10 //max number of other nodes to SYNC with, keep the same with same setting in SwitchMote sketch!
 #define SYNC_EEPROM_ADDR 512 //SYNC_TO and SYNC_INFO data starts at this EEPROM address
+
+void WDTReboot(void) ;
 
 
  typedef struct  {
