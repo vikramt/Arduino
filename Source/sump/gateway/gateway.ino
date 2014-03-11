@@ -174,14 +174,29 @@ void loop() {
 		    Serial.print ("Command is  "); Serial.println(sendRequest.command);
 			Serial.print ("Parameter is  "); Serial.println(sendRequest.parameter);
 			//transmit the packet
-			if (radio.sendWithRetry(sendRequest.nodeID, &sendRequest, sizeof(sendRequest),2,30 ) )
-				Serial.print("Sent and acked  ok!");
-			else 
-				Serial.print(" Unable to  transmit ...");
+			if ( sendRequest.nodeID != cfgcmds.getnodeID() ) {
+				if (radio.sendWithRetry(sendRequest.nodeID, &sendRequest, sizeof(sendRequest),2,30 ) )
+					Serial.print("Sent and acked  ok!");
+				else 
+					Serial.print(" Unable to  transmit ...");
+			}
+			if ( sendRequest.nodeID == cfgcmds.getnodeID() ) {
+				//request is for me on gateway only implemented tempcalib and radiopower
+				switch(sendRequest.command)
+				{
+					case WRITEtempcalibrationreq: 	cfgcmds.settempcalibration(sendRequest.parameter); break ;
+					
+					case WRITEradiopowerreq: 			cfgcmds.setradiopower(sendRequest.parameter); break ;
+					
+					case WDTREBOOT :					WDTReboot(); break ;
+				
+				}
+					
 			
+			}
 		  } else {
 
-			Serial.print("Not Sending Request received: "); Serial.println(serialInputBuffer);
+			Serial.print("Not Sending .. Bad Request: "); Serial.println(serialInputBuffer);
 		  }
 	  }
     }

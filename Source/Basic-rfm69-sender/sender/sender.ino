@@ -182,11 +182,11 @@ void loop() {
     for(byte i = 0; i < sendSize; i++)
       Serial.print((char)payload[i]);
 
-    //if (radio.sendWithRetry(GATEWAYID, payload, sendSize,1,30))
-    radio.send(GATEWAYID, payload, sendSize,0);
-     //  Serial.print(" ok!");
-    //else 
-    //   Serial.print(" nothing...");
+    if (radio.sendWithRetry(GATEWAYID, payload, sendSize,1,30))
+    //radio.send(GATEWAYID, payload, sendSize,0);
+       Serial.print(" ok!");
+    else 
+       Serial.print(" nothing...");
 
     sendSize = (sendSize + 1) % 31;
     Serial.println();

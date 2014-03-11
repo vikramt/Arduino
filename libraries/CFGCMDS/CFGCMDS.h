@@ -21,7 +21,7 @@
 
 //Commands magic numbers are below
 
-#define Reboot				126
+#define WDTREBOOT			126
 #define READtemp			18
 #define READvoltage 		19
 #define	READdata0			20
@@ -62,6 +62,7 @@
 #define SYNC_EEPROM_ADDR 512 //SYNC_TO and SYNC_INFO data starts at this EEPROM address
 
 void WDTReboot(void) ;
+
 
 
  typedef struct  {
