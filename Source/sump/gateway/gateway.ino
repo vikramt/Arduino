@@ -83,7 +83,14 @@ void loop() {
 	byte inputLen = readSerialLine(serialInputBuffer, ';', 32, 10); 
     if (radio.receiveDone())
     {
-      Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");
+      if (radio.ACK_REQUESTED)
+      {
+        byte theNodeID = radio.SENDERID;
+        radio.sendACK();
+        Serial.print(" - ACK sent."); 
+      }
+      Serial.println();
+	  Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");
       if (promiscuousMode)
       {
         Serial.print("to [");Serial.print(radio.TARGETID, DEC);Serial.print("] ");
