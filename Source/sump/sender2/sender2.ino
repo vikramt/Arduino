@@ -108,8 +108,8 @@ long lastPeriod = -1;
 
 void loop() {
 	
-	//curDistance=getDistance();
-   curDistance++;
+	curDistance=getDistance();
+
 	curRadiotemp=radio.readTemperature(cfgcmds.gettempcalibration());
 	doTransmit=1;
    
@@ -170,14 +170,13 @@ void loop() {
 	   Serial.println(txErrors++);
 	}
 	   
-	//Serial.println();
-   // Blink(LED,3);
+
   }
 
    // listen for listen100ms durations after the transmit
    curmillis=millis();
    listenmillis=100 * cfgcmds.getlisten100ms() ;
-   //listenmillis=5000;
+
    
    while ( millis() < ( curmillis + listenmillis)   ) 
    {
@@ -199,12 +198,11 @@ void loop() {
          {
             radio.sendACK();
             Serial.print(" - ACK sent");
-            delay(1);
+            //delay(1);
          }
          radio.sleep();// can we sleep after sending ack
          Serial.print('[');Serial.print(recvSENDERID, DEC);Serial.print("] ");
-         //for (byte i = 0; i < radio.DATALEN; i++)
-         //  Serial.print(radio.DATA[i]);
+
          
          if ( recvDATALEN > 0 ) { //check for datalen cause it maybe just an ACK request etc and radio.data maybe stale
             
@@ -225,7 +223,7 @@ void loop() {
             recvRequest.command=0;
          }
          
-         Blink(LED,5);
+         //Blink(LED,5);
          Serial.println();
          break; // if tx  received break out of listen mode
       }
@@ -236,7 +234,7 @@ void loop() {
     radio.sleep();
     byte s = cfgcmds.getsleepseconds() ; 
     while ( --s ) {
-      LowPower.powerDown(SLEEP_1S, ADC_OFF, BOD_OFF);
+      LowPower.powerDown(SLEEP_500MS, ADC_OFF, BOD_OFF);
       // sleep for sleepseconds durations
    }
   
@@ -313,10 +311,30 @@ void doCommand(byte command, byte parameter )
                                  Serial.println("Set tempcalib"); 
                                  cfgcmds.settempcalibration(parameter); 
                   break ;
-					
+
+					case WRITElisten100msreq: 	    
+                                 Serial.println("Set listen100ms"); 
+                                 cfgcmds.setlisten100ms(parameter); 
+                  break ;
+                  
+               case WRITEsleepsecondsreq: 	    
+                                 Serial.println("Set sleepseconds"); 
+                                 cfgcmds.setsleepseconds(parameter); 
+                  break ;
+                  					
 					case WRITEradiopowerreq: 			
                                  Serial.println("Set Radiopower"); 
                                  cfgcmds.setradiopower(parameter); 
+                  break ;
+                  
+					case WRITExmitminreq: 			
+                                 Serial.println("Set xmitmin"); 
+                                 cfgcmds.setxmitmin(parameter); 
+                  break ;
+
+					case WRITExmitchangereq: 			
+                                 Serial.println("Set xmitchange"); 
+                                 cfgcmds.setxmitchange(parameter); 
                   break ;
 					
 					case WDTREBOOT :					

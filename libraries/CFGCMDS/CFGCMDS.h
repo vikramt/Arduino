@@ -21,7 +21,7 @@
 
 //Commands magic numbers are below
 
-#define WDTREBOOT			126
+#define WDTREBOOT			126  //S:2,126,0
 #define READtemp			18
 #define READvoltage 		19
 #define	READdata0			20
@@ -48,7 +48,7 @@
 
 #define WRITEnodeidreq			40
 #define WRITExmitminreq			41
-#define WRITExmitchangereq		42
+#define WRITExmitchangereq		42  //S:2,42,0
 #define WRITEsleepsecondsreq	43
 #define WRITEradiopowerreq		44  //S:1,44,20
 #define WRITElisten100msreq		45
