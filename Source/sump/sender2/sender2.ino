@@ -109,11 +109,9 @@ long lastPeriod = -1;
 void loop() {
 	
 	curDistance=getDistance();
-
 	curRadiotemp=radio.readTemperature(cfgcmds.gettempcalibration());
-	doTransmit=1;
-   
-   
+	
+   doTransmit=1;    
    //IF xmit change is 1 then hold back transmit if 0 then transmit on loop
 	if ( (cfgcmds.getxmitchange() & bitVoltage ) && (curVoltage != prevVoltage)) { 
 		doTransmit=0; 
@@ -235,7 +233,7 @@ void loop() {
     byte s = cfgcmds.getsleepseconds() ; 
     while ( --s ) {
       LowPower.powerDown(SLEEP_500MS, ADC_OFF, BOD_OFF);
-      // sleep for sleepseconds durations
+      // sleep for sleepseconds durations - seems to need 500MS powerdown instead of 1S to be close????
    }
   
 
@@ -249,11 +247,12 @@ void Blink(byte PIN, int DELAY_MS)
   digitalWrite(PIN,LOW);
 }
 
-// reads a line feed (\n) terminated line from the serial stream
-// returns # of bytes read, up to 255
-// timeout in ms, will timeout and return after so long
+
 byte readSerialLine(char* input, char endOfLineChar, byte maxLength, uint16_t timeout)
 {
+   // reads a line feed (\n) terminated line from the serial stream
+  // returns # of bytes read, up to 255
+ // timeout in ms, will timeout and return after so long
   byte inputLen = 0;
   Serial.setTimeout(timeout);
   inputLen = Serial.readBytesUntil(endOfLineChar, input, maxLength);
@@ -277,79 +276,78 @@ int getDistance() {
 
 void doCommand(byte command, byte parameter )
 {
-   long localdata ;
- 
- 			if ( command  ) {
-				//command should be greater than zero
-				switch(command)
-				{
-					case READtemp: 	
-                                 Serial.print ("Radio Temp:") ; 
-                                 Serial.println(curRadiotemp);
-                                 payload[0]=0;
-                                 sprintf(payload,"T%d",curRadiotemp );
-                                 radio.sendWithRetry(GATEWAYID, payload, sizeof(payload),1,50) ;                            
-                  break ;
-                  
-					case READvoltage: 	
-                                 Serial.print ("BatVoltage") ; 
-                                 Serial.println(curVoltage);
-                                 payload[0]=0;
-                                 sprintf(payload,"V%d",curVoltage );
-                                 radio.sendWithRetry(GATEWAYID, payload, sizeof(payload),1,50);                                              
-                  break ;
+    long localdata ;
 
-					case READdata0: 	
-                                 Serial.print ("Data0: ") ; 
-                                 Serial.println(curDistance);
-                                 payload[0]=0;
-                                 sprintf(payload,"D%d",curDistance );
-                                 radio.sendWithRetry(GATEWAYID, payload, sizeof(payload),1,50)  ;                                            
-                  break ;
-					
-					case WRITEtempcalibrationreq: 	    
-                                 Serial.println("Set tempcalib"); 
-                                 cfgcmds.settempcalibration(parameter); 
-                  break ;
+    if ( command  ) {
+        //command should be greater than zero
+        switch(command) {
+            case READtemp:
+                Serial.print ("Radio Temp:") ;
+                Serial.println(curRadiotemp);
+                payload[0] = 0;
+                sprintf(payload, "T%d", curRadiotemp );
+                radio.sendWithRetry(GATEWAYID, payload, sizeof(payload), 1, 50) ;
+                break ;
 
-					case WRITElisten100msreq: 	    
-                                 Serial.println("Set listen100ms"); 
-                                 cfgcmds.setlisten100ms(parameter); 
-                  break ;
-                  
-               case WRITEsleepsecondsreq: 	    
-                                 Serial.println("Set sleepseconds"); 
-                                 cfgcmds.setsleepseconds(parameter); 
-                  break ;
-                  					
-					case WRITEradiopowerreq: 			
-                                 Serial.println("Set Radiopower"); 
-                                 cfgcmds.setradiopower(parameter); 
-                  break ;
-                  
-					case WRITExmitminreq: 			
-                                 Serial.println("Set xmitmin"); 
-                                 cfgcmds.setxmitmin(parameter); 
-                  break ;
+            case READvoltage:
+                Serial.print ("BatVoltage") ;
+                Serial.println(curVoltage);
+                payload[0] = 0;
+                sprintf(payload, "V%d", curVoltage );
+                radio.sendWithRetry(GATEWAYID, payload, sizeof(payload), 1, 50);
+                break ;
 
-					case WRITExmitchangereq: 			
-                                 Serial.println("Set xmitchange"); 
-                                 cfgcmds.setxmitchange(parameter); 
-                  break ;
-					
-					case WDTREBOOT :					
-                                 Serial.println("Rebooting node"); 
-                                 WDTReboot(); 
-                  break ;
-				
-				}
-					
-			
-			}
-		   else {
+            case READdata0:
+                Serial.print ("Data0: ") ;
+                Serial.println(curDistance);
+                payload[0] = 0;
+                sprintf(payload, "D%d", curDistance );
+                radio.sendWithRetry(GATEWAYID, payload, sizeof(payload), 1, 50)  ;
+                break ;
 
-			Serial.print("Not Executing ..  Command: ");
-		  }  
-        
-   
+            case WRITEtempcalibrationreq:
+                Serial.println("Set tempcalib");
+                cfgcmds.settempcalibration(parameter);
+                break ;
+
+            case WRITElisten100msreq:
+                Serial.println("Set listen100ms");
+                cfgcmds.setlisten100ms(parameter);
+                break ;
+
+            case WRITEsleepsecondsreq:
+                Serial.println("Set sleepseconds");
+                cfgcmds.setsleepseconds(parameter);
+                break ;
+
+            case WRITEradiopowerreq:
+                Serial.println("Set Radiopower");
+                cfgcmds.setradiopower(parameter);
+                break ;
+
+            case WRITExmitminreq:
+                Serial.println("Set xmitmin");
+                cfgcmds.setxmitmin(parameter);
+                break ;
+
+            case WRITExmitchangereq:
+                Serial.println("Set xmitchange");
+                cfgcmds.setxmitchange(parameter);
+                break ;
+
+            case WDTREBOOT :
+                Serial.println("Rebooting node");
+                WDTReboot();
+                break ;
+
+        }
+
+
+    } else {
+
+        Serial.print("Not Executing ..  Command: ");
+    }
+
+
 }
+

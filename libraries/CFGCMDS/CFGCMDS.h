@@ -54,14 +54,14 @@
 #define WRITElisten100msreq		45
 #define WRITEtempcalibrationreq	46
 
-#define bitVoltage 0b00000001
+#define bitVoltage   0b00000001
 #define bitRadiotemp 0b00000010
 #define bitData0	 0b00000100
 #define bitData1	 0b00001000
 #define bitData2	 0b00010000
 #define bitData3	 0b00100000
 #define bitData4	 0b01000000
-#define bitData6	 0b10000000
+#define bitData6	 0b100000000
 
 
 
@@ -75,33 +75,34 @@ void WDTReboot(void) ;
 
 
 
- typedef struct  {
-  byte nodeID;
-  byte command;
-  byte parameter ;
+typedef struct  {
+    byte nodeID;
+    byte command;
+    byte parameter ;
 
 } REQUEST;
 
- typedef struct  {
-  byte frequency;
-  byte isHW;
-  byte nodeID;
-  byte networkID;
-  char encryptionKey[16];
-  byte separator1; //separators needed to keep strings from overlapping
-  char description[10];
-  byte separator2;
-  char reserved[10];
-  byte seperator3;
-  byte xmitmin; //xmit minimally atleast this many minutes default 5 mins
-  byte xmitchange; //if 1 xmit when changes 0 wait for sleep timer for xmit use each bit for each piece of data
-					// bit0 = voltage; bit 1 = radiotemp; bit2=data0......
-  byte sleepseconds; //go back to sleep for this many seconds - node wakes up default every second. default 10 seconds
-  byte radiopower;  //set default radio power to 3
-  byte listen100ms; // listen for how many 100 ms  after xmit default to 5
-  char tempcalibration;  //use this for radio temp sensor calib default -1
-  
-} Configuration;
+
+typedef struct  {
+    byte frequency;
+    byte isHW;
+    byte nodeID;
+    byte networkID;
+    char encryptionKey[16];
+    byte separator1;        //separators needed to keep strings from overlapping
+    char description[10];
+    byte separator2;
+    char reserved[10];
+    byte seperator3;
+    byte xmitmin;     //xmit minimally atleast this many minutes default 5 mins
+    byte xmitchange; //if 1 xmit when changes 0 wait for sleep timer for xmit use each bit for each piece of data
+                    // bit0 = voltage; bit 1 = radiotemp; bit2=data0......
+    byte sleepseconds;  //go back to sleep for this many seconds - node wakes up default every second. default 10 seconds
+    byte radiopower;   //set default radio power to 3
+    byte listen100ms; // listen for how many 100 ms  after xmit default to 5
+    char tempcalibration;  //use this for radio temp sensor calib default -1
+
+} Configuration;;
 
 class CFGCMDS {
 	private:
