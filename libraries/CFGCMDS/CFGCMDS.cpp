@@ -63,6 +63,10 @@ byte CFGCMDS::getxmitchange () {
   return(_config.xmitchange);
 }
 
+byte CFGCMDS::getsleepseconds () {
+  return(_config.sleepseconds);
+}
+
 char* CFGCMDS::getdescription () {
   return(_config.description);
 }
