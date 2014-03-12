@@ -50,7 +50,7 @@
 #define WRITExmitminreq			41
 #define WRITExmitchangereq		42
 #define WRITEsleepsecondsreq	43
-#define WRITEradiopowerreq		44
+#define WRITEradiopowerreq		44  //S:1,44,20
 #define WRITElisten100msreq		45
 #define WRITEtempcalibrationreq	46
 
@@ -62,6 +62,7 @@
 #define SYNC_EEPROM_ADDR 512 //SYNC_TO and SYNC_INFO data starts at this EEPROM address
 
 void WDTReboot(void) ;
+
 
 
 

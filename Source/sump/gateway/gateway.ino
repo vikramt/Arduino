@@ -58,6 +58,8 @@ void setup() {
 		Serial.println(cfgcmds.getlisten100ms());
 		Serial.print("tempcalib: ");
 		Serial.println(cfgcmds.gettempcalibration(),DEC);
+		Serial.print("radiopower: ");
+		Serial.println(cfgcmds.getradiopower(),DEC);
 	}
 	radio.initialize(cfgcmds.getfrequency(),cfgcmds.getnodeID(),cfgcmds.getnetworkID());
 	if ( cfgcmds.getisHW() ) {
@@ -182,16 +184,16 @@ void loop() {
 					Serial.print(" Unable to  transmit ...");
 			}
 			if ( sendRequest.nodeID == cfgcmds.getnodeID() ) {
-				//request is for me on gateway only implemented tempcalib and radiopower
+				//request is for me on gateway only implemented temp and radiopower
 				switch(sendRequest.command)
 				{
 					case READtemp: 	Serial.print ("Gateway temp:") ; Serial.println ( radio.readTemperature(cfgcmds.gettempcalibration())); break ;
 					
-					case WRITEtempcalibrationreq: 	cfgcmds.settempcalibration(sendRequest.parameter); break ;
+					case WRITEtempcalibrationreq: 	    Serial.println("Set tempcalib"); cfgcmds.settempcalibration(sendRequest.parameter); break ;
 					
-					case WRITEradiopowerreq: 			cfgcmds.setradiopower(sendRequest.parameter); break ;
+					case WRITEradiopowerreq: 			Serial.println("Set Radiopower"); cfgcmds.setradiopower(sendRequest.parameter); break ;
 					
-					case WDTREBOOT :					WDTReboot(); break ;
+					case WDTREBOOT :					Serial.println("Rebooting gateway"); WDTReboot(); break ;
 				
 				}
 					

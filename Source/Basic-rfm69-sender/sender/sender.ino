@@ -16,15 +16,8 @@ CFGCMDS cfgcmds; //instantiate the class
 
 
 
-#define NODEID 2 //unique for each node on same network
-#define NETWORKID 10 //the same on all nodes that talk to each other
+
 #define GATEWAYID 1
-//Match frequency to the hardware version of the radio on your Moteino (uncomment one):
-#define FREQUENCY RF69_433MHZ
-//#define FREQUENCY RF69_868MHZ
-//#define FREQUENCY RF69_915MHZ
-#define ENCRYPTKEY "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
-//#define IS_RFM69HW //uncomment only for RFM69HW! Leave out if you have RFM69W!
 #define ACK_TIME 30 // max # of ms to wait for an ack
 #define LED 9 // Moteinos have LEDs on D9
 #define SERIAL_BAUD 115200
@@ -33,19 +26,25 @@ int TRANSMITPERIOD = 900; //transmit a packet to gateway so often (in ms)
 char payload[] = "123 ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 char buff[20];
 byte sendSize=0;
+byte recvSENDERID=0;
+byte recvDATALEN =0 ;
+byte recvRSSI = 0 ;
 boolean requestACK = false;
 SPIFlash flash(8, 0xEF30); //EF40 for 16mbit windbond chip
 RFM69 radio;
 REQUEST recvRequest;
 
+
 void setup() {
  	delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);delay(200);
 	Serial.begin(SERIAL_BAUD);
 	delay(10);
-	if ( ! cfgcmds.getisvalid() ) // virgin CONFIG, expected [4,8,9]
+    
+		if ( ! cfgcmds.getisvalid() ) // virgin CONFIG, expected [4,8,9]
 	{
 		while (1 ) {
 			Serial.println("No valid config found in EEPROM, NOT writing defaults");
+			delay(1500);
 		}
 	}
 	else 
@@ -66,16 +65,20 @@ void setup() {
 		Serial.println(cfgcmds.getxmitchange());
 		Serial.print("sleepseconds: ");
 		Serial.println(cfgcmds.getradiopower());
-		Serial.print("listen: ");
+		Serial.print("listen100ms: ");
 		Serial.println(cfgcmds.getlisten100ms());
 		Serial.print("tempcalib: ");
 		Serial.println(cfgcmds.gettempcalibration(),DEC);
+		//cfgcmds.setradiopower(5);
+		Serial.print("radiopower: ");
+		Serial.println(cfgcmds.getradiopower(),DEC);
 	}
 	radio.initialize(cfgcmds.getfrequency(),cfgcmds.getnodeID(),cfgcmds.getnetworkID());
 	if ( cfgcmds.getisHW() ) {
 		radio.setHighPower(); //uncomment only for RFM69HW!
 	}	
 	radio.encrypt(cfgcmds.getencryptionKey());
+	
 	radio.setPowerLevel(cfgcmds.getradiopower());
 	if (flash.initialize()) {
 		Serial.println("SPI Flash Init OK!");
@@ -87,78 +90,60 @@ void setup() {
 }
 
 long lastPeriod = -1;
+
 void loop() {
   //process any Serial input
   if (Serial.available() > 0)
   {
     char input = Serial.read();
-    if (input >= 48 && input <= 57) //[0,9]
-    {
-      TRANSMITPERIOD = 100 * (input-48);
-      if (TRANSMITPERIOD == 0) TRANSMITPERIOD = 1000;
-      Serial.print("\nChanging delay to ");
-      Serial.print(TRANSMITPERIOD);
-      Serial.println("ms\n");
-    }
     
     if (input == 'r') //d=dump register values
       radio.readAllRegs();
-    //if (input == 'E') //E=enable encryption
-    // radio.encrypt(KEY);
-    //if (input == 'e') //e=disable encryption
-    // radio.encrypt(null);
-    
-    if (input == 'd') //d=dump flash area
-    {
-      Serial.println("Flash content:");
-      int counter = 0;
 
-      while(counter<=256){
-        Serial.print(flash.readByte(counter++), HEX);
-        Serial.print('.');
-      }
-      while(flash.busy());
-      Serial.println();
+
+    if (input == 't')
+    {      
+	  Serial.print ("Node ");
+	  Serial.print(cfgcmds.getnodeID());
+	  Serial.print( " temp:") ; 
+	  Serial.println ( radio.readTemperature(cfgcmds.gettempcalibration()));
     }
-    if (input == 'e')
-    {
-      Serial.print("Erasing Flash chip ... ");
-      flash.chipErase();
-      while(flash.busy());
-      Serial.println("DONE");
-    }
-    if (input == 'i')
-    {
-      Serial.print("DeviceID: ");
-      word jedecid = flash.readDeviceId();
-      Serial.println(jedecid, HEX);
-    }
+	
   }
 
-  //check for any received packets S:2,77,99
+  //check for any received packets S:1,126,0 S:2,18,0 
   if (radio.receiveDone())
-  {
-    Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");
-    for (byte i = 0; i < radio.DATALEN; i++)
-      Serial.print(radio.DATA[i]);
-        if ( radio.DATALEN > 0 ) { //check for datalen cause it maybe just an ACK request etc and radio.data maybe stale
-            memset( &recvRequest,0,sizeof(recvRequest)); // can we zero the request like this
-            if ( radio.DATA[0] == cfgcmds.getnodeID()  ) {
-                memcpy(&recvRequest,(void*) &radio.DATA,sizeof(recvRequest)); 
-                Serial.print("command is : "); Serial.println(recvRequest.command);
-                Serial.print("parameter is :"); Serial.println(recvRequest.parameter);
-            }
-            
-        }
-    Serial.print(" [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
-
-    if (radio.ACK_REQUESTED)
+  { 
+	if ( radio.DATALEN > 0 ) { 
+		// if we have data copy it first
+		memcpy(&recvRequest,(void*) &radio.DATA,sizeof(recvRequest)); 
+		recvSENDERID = radio.SENDERID ;
+		recvDATALEN = radio.DATALEN ;
+	}
+	// then send ack if requested to free up sender
+	if (radio.ACK_REQUESTED)
     {
       radio.sendACK();
       Serial.print(" - ACK sent");
       delay(1);
     }
-	//radio.sleep();////
+	radio.sleep();// can we sleep after sending ack
+    Serial.print('[');Serial.print(recvSENDERID, DEC);Serial.print("] ");
+							//for (byte i = 0; i < radio.DATALEN; i++)
+							//  Serial.print(radio.DATA[i]);
+	
+    if ( recvDATALEN > 0 ) { //check for datalen cause it maybe just an ACK request etc and radio.data maybe stale
+        memset( &recvRequest,0,sizeof(recvRequest)); // can we zero the request like this
+        if ( recvRequest.nodeID == cfgcmds.getnodeID()  ) {
+            Serial.print("command is : "); Serial.println(recvRequest.command);
+            Serial.print("parameter is :"); Serial.println(recvRequest.parameter);
+        } else {
+			Serial.print("To nodeid: "); Serial.println (recvRequest.nodeID);
+        }
+    }
+    Serial.print(" [RX_RSSI:");Serial.print(recvRSSI);Serial.print("]");
+	
+	
     Blink(LED,5);
     Serial.println();
   }
