@@ -4,7 +4,7 @@
 #include <SPIFlash.h> //get it here: http://github.com/lowpowerlab/spiflash
 #include <avr/wdt.h> //comes with Arduino
 #include <CFGCMDS.h>
-/********************        GATEWAY **********************/
+/********************        GATEWAY *************S:1,46,-2*********/
 /********************        GATEWAY **********************/
 CFGCMDS cfgcmds; //instantiate the class
 REQUEST sendRequest ;
@@ -65,6 +65,7 @@ void setup() {
 	}	
     
 	radio.encrypt(cfgcmds.getencryptionKey());
+	
     radio.setPowerLevel(cfgcmds.getradiopower());
     
 	if (flash.initialize()) {
@@ -184,6 +185,8 @@ void loop() {
 				//request is for me on gateway only implemented tempcalib and radiopower
 				switch(sendRequest.command)
 				{
+					case READtemp: 	Serial.print ("Gateway temp:") ; Serial.println ( radio.readTemperature(cfgcmds.gettempcalibration())); break ;
+					
 					case WRITEtempcalibrationreq: 	cfgcmds.settempcalibration(sendRequest.parameter); break ;
 					
 					case WRITEradiopowerreq: 			cfgcmds.setradiopower(sendRequest.parameter); break ;
